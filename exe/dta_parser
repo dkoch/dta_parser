@@ -1,0 +1,73 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "dta_parser"
+require "terminal-table"
+
+unless ARGV[0]
+  puts "Usage: dta_parser <file>"
+  exit
+end
+
+filename = File.expand_path ARGV[0]
+
+data = DtaParser::File.new(filename)
+
+header = Terminal::Table.new do |t|
+  t.add_row [:type               , data.header_record.type]
+  t.add_row [:receiver_bank_code , data.header_record.receiver_bank_code]
+  t.add_row [:sender_bank_code   , data.header_record.sender_bank_code]
+  t.add_row [:sender_name        , data.header_record.sender_name]
+  t.add_row [:date               , data.header_record.date]
+  t.add_row [:sender_account_no  , data.header_record.sender_account_no]
+  t.add_row [:reference          , data.header_record.reference]
+  t.add_row [:currency           , data.header_record.currency]
+end
+
+bookings = Terminal::Table.new do |t|
+  t.add_row [
+    :receiver_bank_code,
+    :receiver_account_no,
+    :internal_customer_no,
+    :code,
+    :code_extension,
+    :sender_bank_code,
+    :sender_account_no,
+    :amount,
+    :receiver_name,
+    :sender_name,
+    :subject,
+    :currency,
+    :extensions_count
+  ]
+  t.add_separator
+  data.booking_records.each do |r|
+    t.add_row [
+      r.receiver_bank_code,
+      r.receiver_account_no,
+      r.internal_customer_no,
+      r.code,
+      r.code_extension,
+      r.sender_bank_code,
+      r.sender_account_no,
+      r.amount,
+      r.receiver_name,
+      r.sender_name,
+      r.subject,
+      r.currency,
+      r.extensions_count
+    ]
+  end
+end
+
+footer = Terminal::Table.new do |t|
+  t.add_row [:bookings_count  , data.footer_record.bookings_count]
+  t.add_row [:sum_bank_codes  , data.footer_record.sum_bank_codes]
+  t.add_row [:sum_account_nos , data.footer_record.sum_account_nos]
+  t.add_row [:sum_amounts     , data.footer_record.sum_amounts]
+end
+
+puts "FILE:\n"    ; puts filename ; puts "\n"
+puts "HEADER:\n"  ; puts header   ; puts "\n"
+puts "BOOKINGS:\n"; puts bookings ; puts "\n"
+puts "FOOTER:\n"  ; puts footer   ; puts "\n"
