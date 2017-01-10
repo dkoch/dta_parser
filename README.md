@@ -30,7 +30,7 @@ Simply pass a filename to parse and use the provided data objects to receive the
 require "yaml"
 file = DtaParser::File.new("path/to/my-bookings.dta")
 
-puts file.heade_reocrd.to_yaml
+puts file.header_record.to_yaml
 # => --- !ruby/object:DtaParser::HeaderRecord
 # raw: 0128ALK7002220000000000FIDOR BANK                 050715    01234567890000000000               24062013                        1
 # type: LK
